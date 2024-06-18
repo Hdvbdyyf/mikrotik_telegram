@@ -43,8 +43,22 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def alarm(context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send the alarm message."""
-    job = context.job
-    await context.bot.send_message(job.chat_id, text=f"Beep! {job.data} seconds are over!")
+    with open(os.path.join(sys.path[0], JSON_FILE), 'r') as in_file:
+        conf = json.load(in_file)
+
+    ip = conf['mikrotik_login']['ip']
+    user = conf['mikrotik_login']['username']
+    passwd = conf['mikrotik_login']['password']
+    mik = Mikrotik(ipaddr=ip, username=user, password=passwd) 
+  
+    iplist = mik.getDHCPLeases()
+    for item in iplist:        
+        if IP_SEARCH_ADDR in item["address"]:
+            data = "Hostname: {} LastSeen: {} status: {} IP: {} ".format(item["host-name"], item["last-seen"], \
+                                                                    item["status"], item["address"])
+    if data:
+        job = context.job
+        await context.bot.send_message(job.chat_id, text=f"{data}")
 
 
 def remove_job_if_exists(name: str, context: ContextTypes.DEFAULT_TYPE) -> bool:
