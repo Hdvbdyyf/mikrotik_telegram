@@ -52,6 +52,7 @@ async def alarm(context: ContextTypes.DEFAULT_TYPE) -> None:
     mik = Mikrotik(ipaddr=ip, username=user, password=passwd) 
   
     iplist = mik.getDHCPLeases()
+    data 
     for item in iplist:        
         if IP_SEARCH_ADDR in item["address"]:
             data = "Hostname: {} LastSeen: {} status: {} IP: {} ".format(item["host-name"], item["last-seen"], \
@@ -127,7 +128,10 @@ if __name__ == "__main__":
     iplist = mik.getDHCPLeases()
     for item in iplist:        
         if IP_SEARCH_ADDR in item["address"]:
-            print("Hostname: {} LastSeen: {} status: {} IP: {} ".format(item["host-name"], item["last-seen"], \
+            hostname = None
+            if "host-name" in item.keys():
+                hostname = item["host-name"]
+            print("Hostname: {} LastSeen: {} status: {} IP: {} ".format(hostname, item["last-seen"], \
                                                                     item["status"], item["address"]))
             
     bot = WowH24Bot(conf['wowh24_bot_config']['token_id'])
