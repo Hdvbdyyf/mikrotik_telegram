@@ -52,11 +52,16 @@ async def alarm(context: ContextTypes.DEFAULT_TYPE) -> None:
     mik = Mikrotik(ipaddr=ip, username=user, password=passwd) 
   
     iplist = mik.getDHCPLeases()
-    data 
+    data = None
     for item in iplist:        
         if IP_SEARCH_ADDR in item["address"]:
-            data = "Hostname: {} LastSeen: {} status: {} IP: {} ".format(item["host-name"], item["last-seen"], \
-                                                                    item["status"], item["address"])
+            hostname = None
+            if "host-name" in item.keys():
+                hostname = item["host-name"]
+            data = "Hostname: {} LastSeen: {} status: {} IP: {} Server:{}".format(hostname, item["last-seen"], \
+                    item["status"], item["address"], item["active-server"])
+            
+
     if data:
         job = context.job
         await context.bot.send_message(job.chat_id, text=f"{data}")
@@ -131,7 +136,7 @@ if __name__ == "__main__":
             hostname = None
             if "host-name" in item.keys():
                 hostname = item["host-name"]
-            print("Hostname: {} LastSeen: {} status: {} IP: {} ".format(hostname, item["last-seen"], \
-                                                                    item["status"], item["address"]))
+            #print("Hostname: {} LastSeen: {} status: {} IP: {} Server:{}".format(hostname, item["last-seen"], \
+            #                                                        item["status"], item["address"], item["active-server"]))
             
     bot = WowH24Bot(conf['wowh24_bot_config']['token_id'])
